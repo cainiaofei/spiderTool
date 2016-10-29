@@ -10,23 +10,40 @@ import org.jsoup.select.Elements;
 
 public class IssueRetrive {
 	
+	private String baseUrl = "https://issues.jboss.org/browse/WELD-";
+	private int pageAmounts = 100;
+			
+	public void issueInfoProcess(){
+		int pageIndex = 1;
+		
+		while(pageIndex<=pageAmounts){
+			try {
+				String curUrl = baseUrl+pageIndex;
+				retriveIssueInfo(curUrl);
+				System.out.println(curUrl);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			pageIndex++;
+		}
+	}
+	
 	public void retriveIssueInfo(String issueUrl) throws IOException{
 		
 		Connection conn = Jsoup.connect(issueUrl);
+		
 		Document doc = conn.get();
 		System.out.println(doc.title());
 		
 		///issueDetails
 		Element issueDetail = doc.getElementById("issuedetails");
 		Elements issueDetails = issueDetail.getElementsByTag("li");
-		System.out.println("-----------------------------------------");
 		for(int i = 0; i < issueDetails.size();i++){
 			Element curElement = issueDetails.get(i);
 			String text = curElement.text();
 			System.out.println(text);
 		}
 		
-		System.out.println("-------------------------");
 		//people details
 		Element peopleDetail = doc.getElementById("peopledetails");
 		Elements peopleDetails = peopleDetail.getElementsByTag("li").get(0).getElementsByTag("dl");
@@ -36,7 +53,6 @@ public class IssueRetrive {
 			System.out.println(text);
 		}
 		
-		System.out.println("------------------------");
 		//date details
 		Element dateDetail = doc.getElementById("datesmodule");
 		Elements dateDetails = dateDetail.getElementsByClass("mod-content").get(0).getElementsByTag("ul").
@@ -47,7 +63,6 @@ public class IssueRetrive {
 			System.out.println(text);
 		}
 		
-		System.out.println("------------------------");
 		//description , maybe there are no description, and we will deal with this case later.
 		Element descriptionDetail = doc.getElementById("descriptionmodule");
 		if(descriptionDetail==null){
@@ -66,10 +81,8 @@ public class IssueRetrive {
 	
 	
 	public static void main(String[] args) throws IOException{
-		String url = "https://issues.jboss.org/browse/WELD-47";
 		IssueRetrive retrive = new IssueRetrive();
-		retrive.retriveIssueInfo(url);
+		retrive.issueInfoProcess();
 		///
-		
 	}
 }
