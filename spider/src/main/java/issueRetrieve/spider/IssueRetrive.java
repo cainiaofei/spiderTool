@@ -3,8 +3,10 @@ package issueRetrieve.spider;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -15,7 +17,8 @@ import org.jsoup.select.Elements;
 public class IssueRetrive {
 	private List<String> textList = new LinkedList<String>();
 	private String baseUrl = "https://issues.jboss.org/browse/WELD-";
-	private int pageAmounts = 100;
+	private int pageAmounts = 2252;
+	private Set<String> set = new HashSet<String>();//in case  duplicate
 	
 	public void issueInfoProcess(){
 		int pageIndex = 1;
@@ -41,11 +44,20 @@ public class IssueRetrive {
 		Document doc = conn.get();
 		String title = doc.title();
 		String anchor = findAnchor(title);
+		if(anchor==null||!anchor.trim().startsWith("WELD-") || set.contains(anchor)){
+			return ;
+		}
+		else{
+			set.add(anchor);
+		}
 		String summary = findSummary(title);
 		sb.append(anchor);
-		sb.append(";"+summary);
+		sb.append(";"+filter(summary));
 		///issueDetails
 		Element issueDetail = doc.getElementById("issuedetails");
+		if(issueDetail==null){
+			return ;
+		}
 		Elements issueDetails = issueDetail.getElementsByTag("li");
 		for(int i = 0; i < issueDetails.size()&&i<8;i++){
 			Element curElement = issueDetails.get(i);
@@ -99,6 +111,9 @@ public class IssueRetrive {
 	//summary retrieve
 	private String findSummary(String title) {
 		int start = title.indexOf(']');
+		if(start==-1){
+			return null;
+		}
 		int end = title.lastIndexOf('-');
 		return title.substring(start+1,end);
 	}
@@ -106,6 +121,9 @@ public class IssueRetrive {
 	//[WELD-50] If a Web Bean component is declared in web-beans.xml ------> WELD-50
 	private String findAnchor(String title) {
 		int start = title.indexOf('[');
+		if(start==-1){
+			return null;
+		}
 		int end = title.indexOf(']');
 		return title.substring(start+1, end);
 	}
@@ -135,7 +153,7 @@ public class IssueRetrive {
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < text.length();i++){
 			char curCh = text.charAt(i);
-			if(curCh!='\r' && curCh!='\t' && curCh!=','){
+			if(curCh!='\r' && curCh!='\t' && curCh!=',' && curCh!='\n'){
 				sb.append(curCh);
 			}
 			else{
@@ -146,18 +164,20 @@ public class IssueRetrive {
 	}
 
 	public void demo() throws IOException{
-		String filePath = "Z:/issue.csv";
-		FileWriter fw = new FileWriter(filePath);   
-	    BufferedWriter bw = new BufferedWriter(fw); 
-	    //写头
-	    String head = "d";
-	    bw.close();
+//		String filePath = "Z:/issue.csv";
+//		FileWriter fw = new FileWriter(filePath);   
+//	    BufferedWriter bw = new BufferedWriter(fw); 
+//	    //写头
+//	    String head = "d";
+//	    bw.close();
+		String url = "https://issues.jboss.org/browse/WELD-70";
+		IssueRetrive retrive = new IssueRetrive();
+		retrive.retriveIssueInfo(url);
 	}
 	public static void main(String[] args) throws IOException{
 		IssueRetrive retrive = new IssueRetrive();
 		retrive.issueInfoProcess();
 		retrive.writeFile();
-		//retrive.demo();
-		///
+		
 	}
 }
