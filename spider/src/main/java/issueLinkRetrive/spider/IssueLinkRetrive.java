@@ -33,7 +33,11 @@ public class IssueLinkRetrive {
 		conn.timeout(30000);
 		Document doc = conn.get();
 		String title = doc.title();
-		List<String> issueIDList = retriveIssueID(title);
+		List<String> issueIDList = new LinkedList<String>();
+		retriveIssueID(issueIDList,title);
+		if(issueIDList.isEmpty()){
+			retriveFromConversation(issueIDList,url.substring(0, url.length()-6));
+		}
 		if(issueIDList.isEmpty()){
 			return ;
 		}
@@ -43,22 +47,62 @@ public class IssueLinkRetrive {
 			}
 			System.out.println();
 		}
-		Elements filterLevels = doc.getElementsByClass("diffbar-item toc-select select-menu js-menu-container js-select-menu");
-		if(filterLevels==null){
-			System.out.println("error the first level ");
+		//user-select-contain
+		
+		Elements filesFullName = doc.getElementsByClass("user-select-contain");
+		for(int i = 0; i < filesFullName.size();i++){
+			Element curElement = filesFullName.get(i);
+			if(curElement.attr("class").equals("user-select-contain")){
+				Element fileElement = curElement;
+				//filter the file that is not java 
+				String fileName = fileElement.attr("title");
+				int suffixNamePos = fileName.lastIndexOf(".");
+				if(fileName.substring(suffixNamePos+1).equals("java")){
+					System.out.println(fileName);
+				}
+				
+			}
 		}
 		
-		Elements descriptions = filterLevels.get(0).getElementsByClass("description");
-		for(int i = 0; i < descriptions.size();i++){
-			Element curDescription = descriptions.get(i);
-			System.out.println(curDescription.text());
-		}
+//		Elements descriptions = filterLevels.get(0).getElementsByClass("description");
+//		for(int i = 0; i < descriptions.size();i++){
+//			Element curDescription = descriptions.get(i);
+//			System.out.println(curDescription.text());
+//		}
 		
 		
 	}
 	
-	private List<String> retriveIssueID(String title) {
-		List<String> issueIDList = new LinkedList<String>();
+	private void retriveFromConversation(List<String> issueIDList, String url) throws IOException {
+		Connection conn = Jsoup.connect(url);
+		Document doc = conn.get();
+		
+		Elements conversation = doc.getElementsByClass("edit-comment-hide");
+		if(conversation!=null){
+			for(int i = 0; i < conversation.size();i++){
+				retriveIssueID(issueIDList,conversation.get(i).text());
+			}
+		}
+		
+		Elements comment = doc.getElementsByClass("commit-message");
+		if(comment!=null){
+			for(int i = 0; i < comment.size();i++){
+				retriveIssueID(issueIDList,comment.get(i).text());
+			}
+		}
+		
+		//discussion-item-ref-title
+		Elements des = doc.getElementsByClass("discussion-item-ref-title");
+		if(des!=null){
+			for(int i = 0; i < des.size();i++){
+				retriveIssueID(issueIDList,des.get(i).text());
+			}
+		}
+		
+	}
+	
+
+	private List<String> retriveIssueID(List<String> issueIDList,String title) {
 		String[] strs = title.split(",|\\[|]|\\(|\\)| |;|\\.|-|/");//split by several separator
 		for(int i = 0; i < strs.length;i++){
 			strs[i] = strs[i].toUpperCase();
@@ -84,7 +128,7 @@ public class IssueLinkRetrive {
 		char[] chs = curValue.toCharArray();
 		for(int i = 0; i < chs.length;i++){
 			if(chs[i]<'0'||chs[i]>'9'){
-				return false;
+				return false; 
 			}
 		}
 		return true;
@@ -92,7 +136,7 @@ public class IssueLinkRetrive {
 
 	public static void main(String[] args) throws IOException{
 		IssueLinkRetrive issueLinkRetrive = new IssueLinkRetrive();
-		String url = "https://github.com/weld/core/pull/78/files";
+		String url = "https://github.com/weld/core/pull/182/files";
 		//issueLinkRetrive.retriveIssueLinkFromAWebHtml(url);
 		issueLinkRetrive.retriveIssueLink();;
 	}
