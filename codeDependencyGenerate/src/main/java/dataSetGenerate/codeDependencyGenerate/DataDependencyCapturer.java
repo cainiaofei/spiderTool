@@ -80,7 +80,7 @@ public class DataDependencyCapturer {
 		}
 		
 		//show
-		show();
+		//show();
 	}
 
 	private void initIBM(InfoBetweenTwoMethod[][] ibm) {
