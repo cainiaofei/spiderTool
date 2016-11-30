@@ -1,0 +1,2 @@
+generate a folder for every module containing two files, one the module containing classes and
+the other what classes the module need to import.

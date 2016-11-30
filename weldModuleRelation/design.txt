@@ -1,0 +1,5 @@
+1.main two parameters: the input folder path, the output location
+2.what classes the module contains? the name+package
+what classes it imports? import
+3. file read and write
+
