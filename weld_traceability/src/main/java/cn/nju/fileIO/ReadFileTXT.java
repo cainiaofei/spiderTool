@@ -8,7 +8,7 @@ import cn.nju.txtPreprocess.CamelCase;
 
 public class ReadFileTXT {
 	private static final String path = "C:/Users/zhangsan/Desktop/weld_traceability/methods/";
-	public void readFile() throws IOException{
+	public String readFile() throws IOException{
 		String file_path = path + "org.jboss.weld.bootstrap.AbstractBeanDeployer.deploySpecialized.txt";
 		BufferedReader br = new BufferedReader(new FileReader(file_path));
 		StringBuilder sb = new StringBuilder();
@@ -18,8 +18,7 @@ public class ReadFileTXT {
 		}
 		br.close();
 		String str = CamelCase.split(sb.toString());
-		
-		//System.out.println(str);
+		return str;
 	}
 	
 	public static void main(String[] args){

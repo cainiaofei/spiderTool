@@ -1,41 +1,29 @@
 package cn.nju.txtPreprocess;
 
-/**
- * 
+
+/*
+ * date:2016/12/5 
  */
 public class CamelCase {
-
-    public static String split(String input) {
-        String words[] = input.split(" ");
-
-        StringBuilder sb = new StringBuilder();
-
-        for (String word : words) {
-            for (String cc : splitCamelCase(word)) {
-            	if(cc.length()==0){
-            		continue;
-            	}
-            	else{
-            		System.out.println(cc);
-            		String regex = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
-            		String[] strs =  cc.split(regex);
-            		for(String str:strs){
-            			//System.out.println(str);
-            		}
-            	}
-                sb.append(cc);
-                sb.append(" ");
-            }
-        }
-
+	
+    /**
+     * receive a String txt and split camel
+     * @param fileTXT code txt
+     * @return after camel split 
+	*/
+    public static String split(String fileTXT) {
+    	StringBuilder sb = new StringBuilder();
+    	for(String word:splitCamelCase(fileTXT)){
+    		if(word.length()==0){
+    			continue;
+    		}
+    		sb.append(word.toLowerCase()+" ");
+    	}
         return sb.toString();
     }
 
     private static String[] splitCamelCase(String s) {
-        //return s.split("(?<!^)(?=[A-Z])");
-    	//return s.split("\\{|\\}|\\<|\\>|\\(|\\)|\\[|\\]\\.|,|\\*|\\+|-|\\=|\\$|;|.[a-z][A-Z][a-z].");
-        //return s.split("/{|/}|/<|/>|/(|/)|/[|/]/.|,|/*|/+|/-|/=|/$");
-    	String regex = "(\\.|\\{|\\}|\\[|\\]|\\(|\\)|\\<|\\>|\\?|\\;|,|:|/)|((?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z]))";
+    	String regex = "(\\.|\\{|\\}|\\[|\\]|\\(|\\)|\\<|\\>|\\?|\\;|,|:|/|\\s+)|((?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z]))";
     	return s.split(regex);
     }
 }
