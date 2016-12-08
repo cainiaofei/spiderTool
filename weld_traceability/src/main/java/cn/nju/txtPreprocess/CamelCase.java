@@ -11,7 +11,7 @@ public class CamelCase {
      * @param fileTXT code txt
      * @return after camel split 
 	*/
-    public static String split(String fileTXT) {
+    public  String split(String fileTXT) {
     	StringBuilder sb = new StringBuilder();
     	for(String word:splitCamelCase(fileTXT)){
     		if(word.length()==0){
@@ -23,7 +23,7 @@ public class CamelCase {
     }
 
     private static String[] splitCamelCase(String s) {
-    	String regex = "(\\.|\\{|\\}|\\[|\\]|\\(|\\)|\\<|\\>|\\?|\\;|,|:|/|\\s+)|((?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z]))";
+    	String regex = "(\\.|\\{|\\}|\\[|\\]|\\(|\\)|\\<|\\>|\\?|\\;|,|:|/|@|-|&|\\$|#|\"|\\s+)|((?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z]))";
     	return s.split(regex);
     }
 }
